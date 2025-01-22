@@ -19,11 +19,13 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.example.shareme.R
+import com.example.shareme.core.util.Screen
 
-@Preview(showSystemUi = true)
+
 @Composable
-fun FirstScreen(){
+fun FirstScreen(navController: NavController){
     Box{
         Image(painter = painterResource(id = R.drawable.img),
             contentDescription = null,
@@ -36,7 +38,7 @@ fun FirstScreen(){
         ) {
             Spacer(modifier = Modifier.padding(vertical = 16.dp))
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigate(Screen.SignUpScreen.route) },
                 colors = ButtonDefaults.buttonColors(colorResource(id = R.color.Button_color)),
                 shape = RoundedCornerShape(10.dp),
                 border = BorderStroke(1.dp, Color.Black),
@@ -55,4 +57,10 @@ fun FirstScreen(){
             }
         }
     }
+}
+
+@Preview(showSystemUi = true)
+@Composable
+fun Show(){
+    Screen.FristScreen
 }

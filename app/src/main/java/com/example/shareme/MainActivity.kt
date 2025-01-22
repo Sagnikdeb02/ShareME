@@ -3,6 +3,7 @@ package com.example.shareme
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -16,12 +17,17 @@ import com.example.shareme.ui.screen.edit.EditScreen
 import com.example.shareme.ui.screen.edit.addEditNoteScreen
 import com.example.shareme.core.util.Screen
 import com.example.shareme.ui.screen.content.Content
+import com.example.shareme.ui.screen.other.FirstScreen
+import com.example.shareme.ui.screen.other.LogIn
+import com.example.shareme.ui.screen.other.SignIn
+import com.example.shareme.ui.screen.other.SignOut
 import com.example.shareme.ui.theme.ShareMETheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        enableEdgeToEdge()
+
+        val authViewModel: AuthViewModel by viewModels()
         setContent {
             ShareMETheme {
                 val navController = rememberNavController()
@@ -31,12 +37,25 @@ class MainActivity : ComponentActivity() {
                     ) {
                         NavHost(
                             navController = navController,
-                            startDestination = Screen.Content.route
+                            startDestination = Screen.FristScreen.route
                         ) {
+                            composable(Screen.SignOut.route){
+                                SignOut(navController,authViewModel)
+                            }
+                            composable(Screen.FristScreen.route){
+                                FirstScreen(navController = navController)
+                            }
+                            composable(Screen.LogInScreen.route){
+                                LogIn(navController,authViewModel)
+                            }
+                            composable(Screen.SignUpScreen.route){
+                                SignIn(navController,authViewModel)
+                            }
                             composable(
                                 route = Screen.Content.route
                             ) {
-                                Content(navController = navController)
+                                Content(navController = navController,
+                                    authViewModel = authViewModel)
                             }
                             composable(
                                 route = Screen.AddEditNoteScreen.route +
@@ -93,6 +112,7 @@ class MainActivity : ComponentActivity() {
                                     noteColor = noteColor
                                 )
                             }
+
                         }
                     }
                 }

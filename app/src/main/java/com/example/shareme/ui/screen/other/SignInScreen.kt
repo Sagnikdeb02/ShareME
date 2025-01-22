@@ -1,5 +1,6 @@
 package com.example.shareme.ui.screen.other
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -8,27 +9,47 @@ import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import com.example.shareme.AuthState
+import com.example.shareme.AuthViewModel
 import com.example.shareme.R
+import com.example.shareme.core.util.Screen
 
-@Preview(showSystemUi = true)
 @Composable
-fun SignIn(){
+fun SignIn(
+    navController: NavController,
+    authViewModel: AuthViewModel
+){
     var username by remember{ mutableStateOf("") }
     var email by remember{ mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var checkPassword by remember { mutableStateOf("") }
+    
 
+    val authState = authViewModel.authState.observeAsState()
+    val context = LocalContext.current
+
+    LaunchedEffect(authState.value) {
+        when(authState.value){
+            is AuthState.Authenticated -> navController.navigate(Screen.Content.route)
+            is AuthState.Error -> Toast.makeText(context,
+                (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
+            else -> Unit
+        }
+    }
 
     Box{
         Image(painter = painterResource(id = R.drawable.img_1),
@@ -38,7 +59,8 @@ fun SignIn(){
     }
     Column(
         modifier = Modifier
-            .padding(16.dp),
+            .padding(16.dp)
+            .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -59,7 +81,10 @@ fun SignIn(){
 
         OutlinedTextField(
             value = username,
-            onValueChange = { },
+            onValueChange = {
+                username = it
+                name = username
+                            },
             label = { Text("Username") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,7 +94,7 @@ fun SignIn(){
 
         OutlinedTextField(
             value = email,
-            onValueChange = {  },
+            onValueChange = { email = it  },
             label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -79,7 +104,9 @@ fun SignIn(){
 
         OutlinedTextField(
             value = password,
-            onValueChange = {},
+            onValueChange = {
+                password =it
+            },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
             modifier = Modifier
@@ -104,7 +131,9 @@ fun SignIn(){
 
         Button(
             onClick = {
+                authViewModel.signin(email, password)
             },
+            enabled = authState.value != AuthState.Loading,
             modifier = Modifier
                 .fillMaxWidth()
                 .size(width = 280.dp, height = 50.dp),
@@ -114,6 +143,13 @@ fun SignIn(){
             Text("Sign In", color = Color.White)
         }
 
+        Spacer(modifier = Modifier.height(8.dp))
+        TextButton(onClick = {
+            navController.navigate(Screen.LogInScreen.route)
+        }) {
+            Text("Don't have an account")
+        }
+
     }
 }
 
@@ -121,3 +157,5 @@ fun SignIn(){
 fun checkPassword(checkPassword : String, password : String): Boolean{
     return checkPassword == password
 }
+
+var name : String = ""

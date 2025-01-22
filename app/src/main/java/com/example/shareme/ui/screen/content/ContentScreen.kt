@@ -20,7 +20,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,15 +34,22 @@ import com.example.shareme.ui.screen.content.sections.OrderSection
 import com.example.shareme.core.util.Screen
 import kotlinx.coroutines.launch
 import android.Manifest
-
+import android.widget.ImageButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.livedata.observeAsState
+import com.example.shareme.AuthState
+import com.example.shareme.AuthViewModel
+import com.example.shareme.firebase.SendDataViewModel
+import com.example.shareme.ui.screen.other.name
 
 
 @Composable
 fun Content(
     navController: NavController,
-    viewModel: NoteViewModel = viewModel(factory = ShareMeViewModelProvider.Factory)
+    viewModel: NoteViewModel = viewModel(factory = ShareMeViewModelProvider.Factory),
+    authViewModel: AuthViewModel
 ) {
-
+    //val dataViewModel = hiltViewModel<SendDataViewModel>()
     val context = LocalContext.current
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted: Boolean ->
@@ -58,21 +64,22 @@ fun Content(
     SideEffect {
         launcher.launch(Manifest.permission.CAMERA)
     }
+
+    val authState = authViewModel.authState.observeAsState()
+    LaunchedEffect(authState.value) {
+        when(authState.value){
+            is AuthState.Unauthenticated -> navController.navigate("login")
+            else -> Unit
+        }
+    }
+
     val state = viewModel.state.value
     val scaffoldState = rememberScaffoldState()
     val scope = rememberCoroutineScope()
 
-    val isDarkTheme = isSystemInDarkTheme()
-
-    val alpha = if (isDarkTheme) {
-        0.3f
-    } else {
-        0.9f
-    }
-
     Scaffold(
         scaffoldState = scaffoldState,
-        bottomBar = {
+        floatingActionButton = {
             Row(
                 horizontalArrangement = Arrangement.Center,
                 modifier = Modifier
@@ -85,16 +92,17 @@ fun Content(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(50.dp),
+                        .height(50.dp)
+                        .padding(horizontal = 8.dp),
                     colors = ButtonDefaults.buttonColors(Color(0xFF9747FF)),
-                    shape = RoundedCornerShape(8.dp)
+                    shape = RoundedCornerShape(8.dp),
                 ) {
                     Text("Add new task", color = Color.Black, fontSize = 20.sp)
                 }
             }
-        }
+        },
+        floatingActionButtonPosition = FabPosition.Center
     ) {
-
         Box(modifier = Modifier
             .fillMaxSize()
         ) {
@@ -102,8 +110,7 @@ fun Content(
                 painter = painterResource(id = R.drawable.img_3),
                 contentDescription = null,
                 alignment = Alignment.TopStart,
-                modifier = Modifier.size(100.dp),
-                colorFilter = ColorFilter.tint(Color.White.copy(alpha = 0.2f))
+                modifier = Modifier.size(85.dp)
             )
         }
         Column(
@@ -114,78 +121,92 @@ fun Content(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .size(60.dp)
+                    .size(60.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Column {
                     Text(
-                        text = "Hello Sagnik",
+                        text = "Hello $name",
                         fontSize = 26.sp,
                         textAlign = TextAlign.Left,
                     )
                     Text(text = "All your works are here")
                 }
-                Spacer(modifier = Modifier.padding(horizontal = 75.dp))
-                Image(
-                    painter = painterResource(id = R.drawable.img_2),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .background(
-                            color = Color(0xFFCDA9EA),
-                            shape = RoundedCornerShape(30.dp)
-                        )
-                        .size(60.dp, 60.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.padding(10.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                ButtonOption(
-                    Title = "Send file",
-                    ImageOp = R.drawable.send_file,
-                    ColorOp = Color(0xFFB4C4FF),
-                    context = LocalContext.current
-                )
-                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                ButtonOption(
-                    Title = "Receive file",
-                    ImageOp = R.drawable.receive_file,
-                    ColorOp = Color(0xFFCFF3E9),
-                    context = LocalContext.current
-                )
+                Spacer(modifier = Modifier.padding(horizontal = 80.dp))
+                Box(
+                    modifier = Modifier.clickable { navController.navigate(Screen.SignOut.route) }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_2),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .background(
+                                color = Color(0xFFCDA9EA),
+                                shape = RoundedCornerShape(30.dp)
+                            )
+                            .size(60.dp, 60.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.padding(it))
+            Spacer(modifier = Modifier.padding(vertical = 8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
             ) {
-                ButtonOption(
-                    Title = "Import file",
-                    ImageOp = R.drawable.img_4,
-                    ColorOp = Color(0xFFC191FF),
-                    context = LocalContext.current
-                )
-                Spacer(modifier = Modifier.padding(horizontal = 8.dp))
-                ButtonOption(
-                    Title = "Favourite",
-                    ImageOp = R.drawable.img_5,
-                    ColorOp = Color(0xFFF4D8B1),
-                    context = LocalContext.current
-                )
+                Column {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonOption(
+                            Title = "Send file",
+                            ImageOp = R.drawable.send_file,
+                            ColorOp = Color(0xFFB4C4FF),
+                            context = LocalContext.current
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                        ButtonOption(
+                            Title = "Receive file",
+                            ImageOp = R.drawable.receive_file,
+                            ColorOp = Color(0xFFCFF3E9),
+                            context = LocalContext.current
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.padding(vertical = 8.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        ButtonOption(
+                            Title = "Import file",
+                            ImageOp = R.drawable.img_4,
+                            ColorOp = Color(0xFFC191FF),
+                            context = LocalContext.current
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = 8.dp))
+                        ButtonOption(
+                            Title = "Favourite",
+                            ImageOp = R.drawable.img_5,
+                            ColorOp = Color(0xFFF4D8B1),
+                            context = LocalContext.current
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.padding(8.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(text = "Your works")
                 IconButton(
@@ -204,8 +225,8 @@ fun Content(
             ) {
                 OrderSection(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .fillMaxWidth(),
+                        //.padding(vertical = 10.dp),
                     noteOrder = state.noteOrder,
                     onOrderChange = {
                         viewModel.onEvent(NotesEvent.Order(it))
@@ -222,10 +243,7 @@ fun Content(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                navController.navigate(
-                                    Screen.AddEditNoteScreen.route +
-                                            "?noteId=${note.id}&noteColor=${note.color}"
-                                )
+
                             },
                         onDeleteClick = {
                             viewModel.onEvent(NotesEvent.DeleteNote(note))
@@ -259,7 +277,8 @@ fun ListItem(
     OutlinedButton(
         onClick = {
             navController.navigate(
-                "edit_note_screen?noteId=${note.id}&noteTitle=${note.title}&noteContent=${note.content}&noteColor=${note.color}"
+                Screen.AddEditNoteScreen.route +
+                        "?noteId=${note.id}&noteColor=${note.color}"
             )
         },
         border = BorderStroke(1.dp, Color.Black),
@@ -304,6 +323,12 @@ fun ListItem(
                     painter = painterResource(id = R.drawable.img_7),
                     contentDescription = null,
                     modifier = Modifier.fillMaxSize()
+                        .clickable {
+                            navController.navigate(
+                                Screen.AddEditNoteScreen.route +
+                                        "?noteId=${note.id}&noteColor=${note.color}"
+                            )
+                        }
                 )
             }
 
