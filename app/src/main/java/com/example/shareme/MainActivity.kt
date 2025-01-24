@@ -16,18 +16,29 @@ import androidx.navigation.navArgument
 import com.example.shareme.ui.screen.edit.EditScreen
 import com.example.shareme.ui.screen.edit.addEditNoteScreen
 import com.example.shareme.core.util.Screen
+import com.example.shareme.ui.screen.content.AddNoteScreen
 import com.example.shareme.ui.screen.content.Content
 import com.example.shareme.ui.screen.other.FirstScreen
 import com.example.shareme.ui.screen.other.LogIn
 import com.example.shareme.ui.screen.other.SignIn
 import com.example.shareme.ui.screen.other.SignOut
 import com.example.shareme.ui.theme.ShareMETheme
+import com.google.firebase.Firebase
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.database
 
 class MainActivity : ComponentActivity() {
+
+    private lateinit var firebaseRef: DatabaseReference
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Initialize Firebase reference to the "notes" path in the database
+        firebaseRef = Firebase.database.getReference("notes")
+
         val authViewModel: AuthViewModel by viewModels()
+
         setContent {
             ShareMETheme {
                 val navController = rememberNavController()
@@ -39,23 +50,28 @@ class MainActivity : ComponentActivity() {
                             navController = navController,
                             startDestination = Screen.FristScreen.route
                         ) {
-                            composable(Screen.SignOut.route){
-                                SignOut(navController,authViewModel)
+                            composable(Screen.SignOut.route) {
+                                SignOut(navController, authViewModel)
                             }
-                            composable(Screen.FristScreen.route){
+                            composable(Screen.FristScreen.route) {
                                 FirstScreen(navController = navController)
                             }
-                            composable(Screen.LogInScreen.route){
-                                LogIn(navController,authViewModel)
+                            composable(Screen.LogInScreen.route) {
+                                LogIn(navController, authViewModel)
                             }
-                            composable(Screen.SignUpScreen.route){
-                                SignIn(navController,authViewModel)
+                            composable(Screen.SignUpScreen.route) {
+                                SignIn(navController, authViewModel)
                             }
                             composable(
                                 route = Screen.Content.route
                             ) {
-                                Content(navController = navController,
-                                    authViewModel = authViewModel)
+                                Content(
+                                    navController = navController,
+                                    authViewModel = authViewModel
+                                )
+                            }
+                            composable(Screen.AddNoteScreen.route) {
+                                AddNoteScreen(navController, firebaseRef)
                             }
                             composable(
                                 route = Screen.AddEditNoteScreen.route +
@@ -112,11 +128,11 @@ class MainActivity : ComponentActivity() {
                                     noteColor = noteColor
                                 )
                             }
-
                         }
                     }
                 }
             }
         }
     }
+
 }

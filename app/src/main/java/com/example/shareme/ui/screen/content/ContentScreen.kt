@@ -166,14 +166,16 @@ fun Content(
                             Title = "Send file",
                             ImageOp = R.drawable.send_file,
                             ColorOp = Color(0xFFB4C4FF),
-                            context = LocalContext.current
+                            //context = LocalContext.current
+                            navController = navController
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                         ButtonOption(
                             Title = "Receive file",
                             ImageOp = R.drawable.receive_file,
                             ColorOp = Color(0xFFCFF3E9),
-                            context = LocalContext.current
+                            //context = LocalContext.current
+                            navController = navController
                         )
                     }
 
@@ -188,14 +190,16 @@ fun Content(
                             Title = "Import file",
                             ImageOp = R.drawable.img_4,
                             ColorOp = Color(0xFFC191FF),
-                            context = LocalContext.current
+                            //context = LocalContext.current
+                            navController = navController
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                         ButtonOption(
                             Title = "Favourite",
                             ImageOp = R.drawable.img_5,
                             ColorOp = Color(0xFFF4D8B1),
-                            context = LocalContext.current
+                            //context = LocalContext.current
+                            navController = navController
                         )
                     }
                 }
@@ -352,12 +356,13 @@ fun ButtonOption(
     Title : String,
     ImageOp : Int ,
     ColorOp : Color,
-    context: Context
+    //context: Context
+    navController: NavController
 ){
-
     Button(
         onClick = {
-            openCamera(context)
+            //openCamera(context)
+            navController.navigate(Screen.AddNoteScreen.route)
         },
         modifier = Modifier
             .size(width = 180.dp, height = 80.dp),
