@@ -1,5 +1,6 @@
 package com.example.shareme
 
+import ShowNotesScreen
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -16,7 +17,7 @@ import androidx.navigation.navArgument
 import com.example.shareme.ui.screen.edit.EditScreen
 import com.example.shareme.ui.screen.edit.addEditNoteScreen
 import com.example.shareme.core.util.Screen
-import com.example.shareme.ui.screen.content.AddNoteScreen
+import com.example.shareme.firebase.UploadNoteScreen
 import com.example.shareme.ui.screen.content.Content
 import com.example.shareme.ui.screen.other.FirstScreen
 import com.example.shareme.ui.screen.other.LogIn
@@ -25,7 +26,9 @@ import com.example.shareme.ui.screen.other.SignOut
 import com.example.shareme.ui.theme.ShareMETheme
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.database
+import io.appwrite.Client
 
 class MainActivity : ComponentActivity() {
 
@@ -38,6 +41,9 @@ class MainActivity : ComponentActivity() {
         firebaseRef = Firebase.database.getReference("notes")
 
         val authViewModel: AuthViewModel by viewModels()
+
+        val database = FirebaseDatabase.getInstance("https://shareme-3cb97-default-rtdb.firebaseio.com/")
+        val client = Client(this).setProject("6794e88000325104eef8")
 
         setContent {
             ShareMETheme {
@@ -71,7 +77,23 @@ class MainActivity : ComponentActivity() {
                                 )
                             }
                             composable(Screen.AddNoteScreen.route) {
-                                AddNoteScreen(navController, firebaseRef)
+                                /*AddNoteScreen(
+                                    navController = navController,
+                                    firebaseRef = firebaseRef,
+                                    storageRef = FirebaseStorage.getInstance().reference
+                                )*/
+                                UploadNoteScreen(
+                                    client = client,
+                                    database = database,
+                                    navController = navController
+                                )
+                            }
+                            composable(Screen.ShowNoteScreen.route){
+                                ShowNotesScreen(
+                                    database = database,
+                                    modifier = Modifier,
+                                    client = client
+                                )
                             }
                             composable(
                                 route = Screen.AddEditNoteScreen.route +

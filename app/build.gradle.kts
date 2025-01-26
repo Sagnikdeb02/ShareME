@@ -70,6 +70,9 @@ dependencies {
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.firebase.database.ktx)
     implementation(libs.firebase.database)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.firebase.firestore.ktx)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -78,16 +81,15 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Compose UI
     implementation("androidx.compose.ui:ui:1.6.8")
     implementation("androidx.compose.material:material:1.6.8")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.8")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
-    implementation("androidx.activity:activity-compose:1.9.0")
 
-    // Additional lifecycle dependencies
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.3")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
     implementation("androidx.activity:activity-compose:1.9.0")
 
     // Compose Material and Coil
@@ -103,12 +105,16 @@ dependencies {
     ksp("androidx.room:room-compiler:2.5.0")
     implementation("androidx.room:room-ktx:2.5.0")
 
-
-
+    // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
+    // Firebase Storage
+    implementation("com.google.firebase:firebase-storage-ktx:20.2.0")
 
+
+    implementation("io.appwrite:sdk-for-android:5.1.0")
 }
+
 
 
 // Uncomment Firebase and Play Services dependencies if needed

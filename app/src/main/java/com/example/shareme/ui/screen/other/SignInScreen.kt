@@ -32,18 +32,17 @@ import com.example.shareme.core.util.Screen
 fun SignIn(
     navController: NavController,
     authViewModel: AuthViewModel
-){
-    var username by remember{ mutableStateOf("") }
-    var email by remember{ mutableStateOf("") }
+) {
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var checkPassword by remember { mutableStateOf("") }
-    
 
     val authState = authViewModel.authState.observeAsState()
     val context = LocalContext.current
 
     LaunchedEffect(authState.value) {
-        when(authState.value){
+        when (authState.value) {
             is AuthState.Authenticated -> navController.navigate(Screen.Content.route)
             is AuthState.Error -> Toast.makeText(context,
                 (authState.value as AuthState.Error).message, Toast.LENGTH_SHORT).show()
@@ -51,12 +50,15 @@ fun SignIn(
         }
     }
 
-    Box{
-        Image(painter = painterResource(id = R.drawable.img_1),
+    Box {
+        Image(
+            painter = painterResource(id = R.drawable.img_1),
             contentDescription = null,
             contentScale = ContentScale.FillBounds,
-            modifier = Modifier.fillMaxSize())
+            modifier = Modifier.fillMaxSize()
+        )
     }
+
     Column(
         modifier = Modifier
             .padding(16.dp)
@@ -64,27 +66,30 @@ fun SignIn(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(text = "Sign Up",
+        Text(
+            text = "Sign Up",
             fontSize = 24.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black)
+            color = Color.Black
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
-        Image(painter = painterResource(id = R.drawable.img_2),
+        Image(
+            painter = painterResource(id = R.drawable.img_2),
             contentDescription = null,
             modifier = Modifier
                 .size(110.dp)
                 .background(
                     color = Color(0xFFCDA9EA),
                     shape = RoundedCornerShape(50.dp)
-                ))
+                )
+        )
 
         OutlinedTextField(
             value = username,
             onValueChange = {
                 username = it
-                name = username
-                            },
+            },
             label = { Text("Username") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -94,7 +99,7 @@ fun SignIn(
 
         OutlinedTextField(
             value = email,
-            onValueChange = { email = it  },
+            onValueChange = { email = it },
             label = { Text("Email") },
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,7 +110,7 @@ fun SignIn(
         OutlinedTextField(
             value = password,
             onValueChange = {
-                password =it
+                password = it
             },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation(),
@@ -124,14 +129,19 @@ fun SignIn(
                 .fillMaxWidth()
                 .padding(8.dp),
             shape = RoundedCornerShape(8.dp),
-            isError =  checkPassword(checkPassword,password)
+            isError = checkPassword != password
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
             onClick = {
-                authViewModel.signin(email, password)
+                if (password == checkPassword) {
+                    // Ensure password match
+                    authViewModel.signin(email, password)
+                } else {
+                    Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+                }
             },
             enabled = authState.value != AuthState.Loading,
             modifier = Modifier
@@ -140,18 +150,21 @@ fun SignIn(
             colors = ButtonDefaults.buttonColors(Color.Black),
             shape = RoundedCornerShape(8.dp),
         ) {
-            Text("Sign In", color = Color.White)
+            Text("Sign Up", color = Color.White)
         }
 
         Spacer(modifier = Modifier.height(8.dp))
+
         TextButton(onClick = {
             navController.navigate(Screen.LogInScreen.route)
         }) {
-            Text("Don't have an account")
+            Text("Already have an account? Log In")
         }
-
     }
 }
+
+
+
 
 
 fun checkPassword(checkPassword : String, password : String): Boolean{

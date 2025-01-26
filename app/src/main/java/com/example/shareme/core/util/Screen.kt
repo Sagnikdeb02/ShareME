@@ -9,4 +9,5 @@ sealed class Screen(val route: String){
     object FristScreen : Screen("first_screen")
     object SignOut : Screen("sign_out")
     object AddNoteScreen : Screen("add_note_screen")
+    object ShowNoteScreen : Screen("show_note_screen")
 }

@@ -34,12 +34,10 @@ import com.example.shareme.ui.screen.content.sections.OrderSection
 import com.example.shareme.core.util.Screen
 import kotlinx.coroutines.launch
 import android.Manifest
-import android.widget.ImageButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import com.example.shareme.AuthState
 import com.example.shareme.AuthViewModel
-import com.example.shareme.firebase.SendDataViewModel
 import com.example.shareme.ui.screen.other.name
 
 
@@ -166,16 +164,16 @@ fun Content(
                             Title = "Send file",
                             ImageOp = R.drawable.send_file,
                             ColorOp = Color(0xFFB4C4FF),
-                            //context = LocalContext.current
-                            navController = navController
+                            navController = navController,
+                            destinationRoute = Screen.AddNoteScreen.route
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                         ButtonOption(
                             Title = "Receive file",
                             ImageOp = R.drawable.receive_file,
                             ColorOp = Color(0xFFCFF3E9),
-                            //context = LocalContext.current
-                            navController = navController
+                            navController = navController,
+                            destinationRoute = Screen.ShowNoteScreen.route
                         )
                     }
 
@@ -191,7 +189,8 @@ fun Content(
                             ImageOp = R.drawable.img_4,
                             ColorOp = Color(0xFFC191FF),
                             //context = LocalContext.current
-                            navController = navController
+                            navController = navController,
+                            destinationRoute = Screen.AddNoteScreen.route
                         )
                         Spacer(modifier = Modifier.padding(horizontal = 8.dp))
                         ButtonOption(
@@ -199,7 +198,8 @@ fun Content(
                             ImageOp = R.drawable.img_5,
                             ColorOp = Color(0xFFF4D8B1),
                             //context = LocalContext.current
-                            navController = navController
+                            navController = navController,
+                            destinationRoute = Screen.AddNoteScreen.route
                         )
                     }
                 }
@@ -353,16 +353,15 @@ fun ListItem(
 
 @Composable
 fun ButtonOption(
-    Title : String,
-    ImageOp : Int ,
-    ColorOp : Color,
-    //context: Context
-    navController: NavController
-){
+    Title: String,
+    ImageOp: Int,
+    ColorOp: Color,
+    navController: NavController,
+    destinationRoute: String // Add this parameter to determine the route
+) {
     Button(
         onClick = {
-            //openCamera(context)
-            navController.navigate(Screen.AddNoteScreen.route)
+            navController.navigate(destinationRoute) // Use the destination route for navigation
         },
         modifier = Modifier
             .size(width = 180.dp, height = 80.dp),
@@ -378,8 +377,9 @@ fun ButtonOption(
                     .size(30.dp)
                     .background(Color.White, RoundedCornerShape(20.dp)),
                 contentAlignment = Alignment.Center
-            ){
-                Image(painter = painterResource(id = ImageOp),
+            ) {
+                Image(
+                    painter = painterResource(id = ImageOp),
                     contentDescription = null,
                     alignment = Alignment.TopStart,
                     modifier = Modifier.size(24.dp)
@@ -389,6 +389,8 @@ fun ButtonOption(
         }
     }
 }
+
+
 
 fun openCamera(context: Context) {
     val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
